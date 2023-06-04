@@ -279,10 +279,10 @@
 
 // <e> USART3 (Universal synchronous asynchronous receiver transmitter) [Driver_USART3]
 // <i> Configuration settings for Driver_USART3 in component ::CMSIS Driver:USART
-#define RTE_USART3                      0
+#define RTE_USART3                      1
 
 //   <o> USART3_TX Pin <0=>Not Used <1=>PB10 <2=>PC10 <3=>PD8
-#define RTE_USART3_TX_ID                0
+#define RTE_USART3_TX_ID                3
 #if    (RTE_USART3_TX_ID == 0)
 #define RTE_USART3_TX                   0
 #elif  (RTE_USART3_TX_ID == 1)
@@ -302,7 +302,7 @@
 #endif
 
 //   <o> USART3_RX Pin <0=>Not Used <1=>PB11 <2=>PC11 <3=>PD9 <4=>PC5
-#define RTE_USART3_RX_ID                0
+#define RTE_USART3_RX_ID                3
 #if    (RTE_USART3_RX_ID == 0)
 #define RTE_USART3_RX                   0
 #elif  (RTE_USART3_RX_ID == 1)
@@ -592,10 +592,10 @@
 
 // <e> USART6 (Universal synchronous asynchronous receiver transmitter) [Driver_USART6]
 // <i> Configuration settings for Driver_USART6 in component ::CMSIS Driver:USART
-#define RTE_USART6                      0
+#define RTE_USART6                      1
 
 //   <o> USART6_TX Pin <0=>Not Used <1=>PA11 <2=>PC6 <3=>PG14
-#define RTE_USART6_TX_ID                0
+#define RTE_USART6_TX_ID                3
 #if    (RTE_USART6_TX_ID == 0)
 #define RTE_USART6_TX                   0
 #elif  (RTE_USART6_TX_ID == 1)
@@ -615,7 +615,7 @@
 #endif
 
 //   <o> USART6_RX Pin <0=>Not Used <1=>PA12 <2=>PC7 <3=>PG9
-#define RTE_USART6_RX_ID                0
+#define RTE_USART6_RX_ID                3
 #if    (RTE_USART6_RX_ID == 0)
 #define RTE_USART6_RX                   0
 #elif  (RTE_USART6_RX_ID == 1)
@@ -1015,10 +1015,10 @@
 
 // <e> I2C1 (Inter-integrated Circuit Interface 1) [Driver_I2C1]
 // <i> Configuration settings for Driver_I2C1 in component ::CMSIS Driver:I2C
-#define RTE_I2C1                        0
+#define RTE_I2C1                        1
 
 //   <o> I2C1_SCL Pin <0=>PB6 <1=>PB8
-#define RTE_I2C1_SCL_PORT_ID            0
+#define RTE_I2C1_SCL_PORT_ID            1
 #if    (RTE_I2C1_SCL_PORT_ID == 0)
 #define RTE_I2C1_SCL_PORT               GPIOB
 #define RTE_I2C1_SCL_BIT                6
@@ -1030,7 +1030,7 @@
 #endif
 
 //   <o> I2C1_SDA Pin <0=>PB7 <1=>PB9
-#define RTE_I2C1_SDA_PORT_ID            0
+#define RTE_I2C1_SDA_PORT_ID            1
 #if    (RTE_I2C1_SDA_PORT_ID == 0)
 #define RTE_I2C1_SDA_PORT               GPIOB
 #define RTE_I2C1_SDA_BIT                7
@@ -1222,7 +1222,7 @@
 
 // <e> SPI1 (Serial Peripheral Interface 1) [Driver_SPI1]
 // <i> Configuration settings for Driver_SPI1 in component ::CMSIS Driver:SPI
-#define RTE_SPI1                        0
+#define RTE_SPI1                        1
 
 //   <o> SPI1_MISO Pin <0=>Not Used <1=>PA6 <2=>PB4
 #define RTE_SPI1_MISO_PORT_ID           0
@@ -1241,7 +1241,7 @@
 #endif
 
 //   <o> SPI1_MOSI Pin <0=>Not Used <1=>PA7 <2=>PB5
-#define RTE_SPI1_MOSI_PORT_ID           0
+#define RTE_SPI1_MOSI_PORT_ID           1
 #if    (RTE_SPI1_MOSI_PORT_ID == 0)
 #define RTE_SPI1_MOSI                   0
 #elif  (RTE_SPI1_MOSI_PORT_ID == 1)
