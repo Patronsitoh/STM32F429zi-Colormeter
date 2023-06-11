@@ -1,11 +1,14 @@
 #include "principal.h"
 #include "color.h"
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
  
 osThreadId_t tid_Principal;                        // thread id
  
 void principalCallback(void *argument);                   // thread function
 
-
+char _buffer[12];
 
 
 
@@ -13,13 +16,15 @@ typedef struct{
 	char buffer[12];	
 }Trama_TeraTerm;
 
-float bufferGordo[3];
-
+Trama_TeraTerm latestSamples[50];
+uint16_t pointerLatestSamples = 0;
 
 
 extern osThreadId_t tid_COLOR;
 extern osMessageQueueId_t queueColor;
 Trama_Color tramaColorRecibida;
+
+extern 	uint16_t segundos, minutos, horas;
 
 
 
@@ -32,6 +37,11 @@ typedef enum {
 SystemState estadoSistema;
 
 	
+typedef struct{
+	char string_p[100];
+} TRAMA_COM;
+
+
 
 
 
@@ -66,17 +76,13 @@ void principalCallback(void *argument) {
 			osThreadFlagsSet(tid_COLOR,0x10); ///Haz una medida bro				
 			
 			
-			osMessageQueueGet(queueColor,&tramaColorRecibida,0U,0U);				
+				//osMessageQueueGet(queueColor,&tramaColorRecibida,0U,0U);				
 				
-			addTimeStampColorQueue(tramaColorRecibida.latestSample);
-			
+				if(osMessageQueueGet(queueColor,&tramaColorRecibida,0U,0U) == osOK){		
 				
+					addTimeStampColorQueue(tramaColorRecibida.latestSample);		
+				}				
 				
-				
-				
-			
-			
-			
 			
 				break;
 			
@@ -103,18 +109,33 @@ void principalCallback(void *argument) {
 
 
 /**
-	@brief Añade un elemento a la cola de ultimas mediciones
+	@brief Almacena el valor recibido y lo añade a la cola de 50 ultimas medidas sitauada en RAM-
+		Setea el valor RGB entre 0-100% y añade el timeStamp a cada medida.
+		-> timeStamp = hhmmssrrggbb
+		
 
 */
 
-void addTimeStampColorQueue(ColorRGB_Sample sample){
-	bufferGordo[0] = sample.red;
-	bufferGordo[1] = sample.green;
-	bufferGordo[2] = sample.blue;
+void addTimeStampColorQueue(ColorRGB_Sample sample){	
 	
+	uint16_t scaledR = (uint16_t)((sample.red / 255.0) * 99);
+	uint16_t scaledG = (uint16_t)((sample.green / 255.0) * 99);
+	uint16_t scaledB = (uint16_t)((sample.blue / 255.0) * 99);
+	
+	//Función snpfintf para proteger desbordamientos
+	snprintf(_buffer, 7, "%02u%02u%02u", horas, minutos, segundos); // Limitamos la escritura a los primeros 6 caracteres
+	snprintf(_buffer + 6, 7, "%02u%02u%02u", scaledR, scaledG, scaledB); // Limitamos la escritura a los primeros 6 caracteres
+	
+	strcpy(latestSamples[pointerLatestSamples].buffer, _buffer);
+		
+	if(pointerLatestSamples < 49){
+		pointerLatestSamples++;
+	}else{
+		pointerLatestSamples = 0;		
+	}		
 
 		
-	}	
+}	
 
 
 
