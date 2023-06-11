@@ -282,7 +282,7 @@
 #define RTE_USART3                      1
 
 //   <o> USART3_TX Pin <0=>Not Used <1=>PB10 <2=>PC10 <3=>PD8
-#define RTE_USART3_TX_ID                3
+#define RTE_USART3_TX_ID                0
 #if    (RTE_USART3_TX_ID == 0)
 #define RTE_USART3_TX                   0
 #elif  (RTE_USART3_TX_ID == 1)
@@ -592,10 +592,10 @@
 
 // <e> USART6 (Universal synchronous asynchronous receiver transmitter) [Driver_USART6]
 // <i> Configuration settings for Driver_USART6 in component ::CMSIS Driver:USART
-#define RTE_USART6                      1
+#define RTE_USART6                      0
 
 //   <o> USART6_TX Pin <0=>Not Used <1=>PA11 <2=>PC6 <3=>PG14
-#define RTE_USART6_TX_ID                3
+#define RTE_USART6_TX_ID                0
 #if    (RTE_USART6_TX_ID == 0)
 #define RTE_USART6_TX                   0
 #elif  (RTE_USART6_TX_ID == 1)
@@ -615,7 +615,7 @@
 #endif
 
 //   <o> USART6_RX Pin <0=>Not Used <1=>PA12 <2=>PC7 <3=>PG9
-#define RTE_USART6_RX_ID                3
+#define RTE_USART6_RX_ID                0
 #if    (RTE_USART6_RX_ID == 0)
 #define RTE_USART6_RX                   0
 #elif  (RTE_USART6_RX_ID == 1)
