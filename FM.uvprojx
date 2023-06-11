@@ -413,26 +413,6 @@
               <FileType>5</FileType>
               <FilePath>.\color.h</FilePath>
             </File>
-            <File>
-              <FileName>clock.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\clock.h</FilePath>
-            </File>
-            <File>
-              <FileName>clock.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\clock.c</FilePath>
-            </File>
-            <File>
-              <FileName>principal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\principal.c</FilePath>
-            </File>
-            <File>
-              <FileName>principal.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\principal.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

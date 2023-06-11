@@ -46,21 +46,6 @@ static GPIO_InitTypeDef GPIO_InitStruct;
 
 
 /* Exported types ------------------------------------------------------------*/
-
-typedef enum{
-	TRUE, FALSE
-}bool;
-
-
-/*
-/////////////////FLAGS//////////////////
-#define NEW_SAMPLE_COLOR_FLAG 0x10
-#define I2C_FLAG_QUEUE 0x02
-*/
-
-
-
-
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

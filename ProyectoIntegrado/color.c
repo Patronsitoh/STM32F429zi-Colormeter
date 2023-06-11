@@ -8,14 +8,19 @@ static ARM_DRIVER_I2C *I2Cdrv = &Driver_I2C1;
 osThreadId_t tid_COLOR;                       // thread id
 void threadColor_callback (void *argument); // thread function 
 
-ColorRGB_Sample lastestSamples[50]; //Aquí se guardarán las 50 utlimas medidas en formato RGB
-uint16_t lastestSamplesPointer = 0; //Puntero que indica el siguiente  hueco a rellenar en la cola
 
-float r, g, b = 0; //Valores de color para los Watches
- 
+
+
+Trama_Color tramaColor; //se gurdan los mensajes de la cola 
+osMessageQueueId_t queueColor;
+
+
+float r, g, b = 0; //Valores de color para los Watches 
 int init_COLOR (void) {
   
-  tid_COLOR = osThreadNew(threadColor_callback, NULL, NULL);
+  tid_COLOR  = osThreadNew(threadColor_callback, NULL, NULL);
+	queueColor = osMessageQueueNew(4,sizeof(Trama_Color), NULL);
+	
 	
   if (tid_COLOR == NULL) {
     return(-1);
@@ -30,12 +35,17 @@ void threadColor_callback (void *argument) {
 	configurar_sensor();
 	
   while (1) {
-		iniciar_registros_sensor();
-		configurar_sensor();
-		getRGBData();
-			//a++;			
 		
-		osDelay(1000);		
+		uint32_t event = osThreadFlagsWait(0x10, osFlagsWaitAny, osWaitForever);
+		
+		if(event == 0x10){
+			iniciar_registros_sensor();
+			configurar_sensor();
+			getRGBData();
+				//a++;			
+			
+			osDelay(5000); // hay que quitarlo en funcuón de lo que pidan
+		}	
 		osThreadYield();		
   }
 }
@@ -101,26 +111,13 @@ void getRGBData(void){
 	
 	r = lastSample.red = (float)red / clear*255;
 	g = lastSample.green = (float)green / clear*255;
-	b = lastSample.blue = (float)blue / clear*255;	
+	b = lastSample.blue = (float)blue / clear*255;
 	
-	addToQueue(lastSample);
+	tramaColor.latestSample = lastSample;
 	
-	
-	
+	osMessageQueuePut(queueColor, &tramaColor, 0U, 0U); 
+		
 }
 
 
-/**
-	@brief Añade un elemento a la cola de ultimas mediciones
 
-*/
-void addToQueue(ColorRGB_Sample sample){
-	lastestSamples[lastestSamplesPointer] = sample;
-	
-	if(sizeof(lastestSamples) -1){
-		lastestSamplesPointer = 0;
-	}else{
-		lastestSamplesPointer++;
-	}		
-	
-}

@@ -38,7 +38,17 @@ void getRGBData(void);
 void configurar_sensor(void);
 void leer_registro(void); 
 void iniciar_registros_sensor(void);
-void addToQueue(ColorRGB_Sample sample);
+
+
+
+
+typedef struct{
+	ColorRGB_Sample latestSample; //medida mas reciente obtenida	
+} Trama_Color;
+
+
+
+
 
 
 #endif

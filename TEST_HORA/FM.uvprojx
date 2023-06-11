@@ -423,16 +423,6 @@
               <FileType>1</FileType>
               <FilePath>.\clock.c</FilePath>
             </File>
-            <File>
-              <FileName>principal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\principal.c</FilePath>
-            </File>
-            <File>
-              <FileName>principal.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\principal.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

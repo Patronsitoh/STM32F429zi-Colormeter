@@ -39,12 +39,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
-
-
-#include "color.h"
+//#include "color.h"
 #include "clock.h"
-#include "principal.h"
 
 
 
@@ -88,16 +84,6 @@ uint32_t HAL_GetTick (void) {
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-
-
-
-
-
-
-
-
-
-
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 	uint32_t ledR = GPIO_PIN_13;
@@ -167,12 +153,8 @@ int main(void)
 
   /* Create thread functions that start executing, 
   Example: osThreadNew(app_main, NULL, NULL); */
-	init_COLOR();
+	//init_COLOR();
 	initiClock();
-	init_Principal();
-	
-
-	
 	
   /* Start thread execution */
   osKernelStart();
