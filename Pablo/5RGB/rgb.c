@@ -51,28 +51,46 @@ void Th_rgb(void *argument) {
 	}
 }
 
-static void myPWM_New_Pulse(TIM_HandleTypeDef htim, TIM_OC_InitTypeDef soc, MSGQUEUE_OBJ_RGB msg){
-	static uint8_t  newValor;
-	
-	newValor = round(msg.pulse*RELAC_VOL_PULSE);
-	HAL_TIM_PWM_Stop(&htim, TIM_CHANNEL_1);
-	HAL_TIM_PWM_DeInit(&htim);
-	soc.Pulse = (100 - newValor);
-	HAL_TIM_PWM_Init(&htim);
-	HAL_TIM_PWM_ConfigChannel(&htim, &soc, TIM_CHANNEL_1);
-	HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_1);
+static void myPWM_New_Pulse(TIM_HandleTypeDef htim, TIM_OC_InitTypeDef soc, MSGQUEUE_OBJ_RGB msg) {
+    static uint8_t newValorRojo;
+    static uint8_t newValorVerde;
+    static uint8_t newValorAzul;
+
+    newValorRojo = round(msg.pulse * RELAC_VOL_PULSE);
+    newValorVerde = round(msg.pulse * RELAC_VOL_PULSE);
+    newValorAzul = round(msg.pulse * RELAC_VOL_PULSE);
+
+    HAL_TIM_PWM_Stop(&htim, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Stop(&htim, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Stop(&htim, TIM_CHANNEL_3);
+
+    HAL_TIM_PWM_DeInit(&htim);
+
+    soc.Pulse = (100 - newValorRojo);
+    HAL_TIM_PWM_Init(&htim);
+    HAL_TIM_PWM_ConfigChannel(&htim, &soc, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_1);
+
+    soc.Pulse = (100 - newValorVerde);
+    HAL_TIM_PWM_ConfigChannel(&htim, &soc, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_2);
+
+    soc.Pulse = (100 - newValorAzul);
+    HAL_TIM_PWM_ConfigChannel(&htim, &soc, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&htim, TIM_CHANNEL_3);
 }
+
 
 static void myPWM_Init(GPIO_InitTypeDef *sgpio, TIM_HandleTypeDef *htim, TIM_OC_InitTypeDef *soc){
 	/*TIM4 CHA1*/
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-
+	__HAL_RCC_GPIOD_CLK_ENABLE();	
 	
-	sgpio->Pin = GPIO_PIN_12;//ROJO
 	sgpio->Mode = GPIO_MODE_AF_PP;
 	sgpio->Alternate = GPIO_AF2_TIM4;
 	sgpio->Pull = GPIO_NOPULL;
 	sgpio->Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	
+	sgpio->Pin = GPIO_PIN_12;//ROJO
 	HAL_GPIO_Init(GPIOD, sgpio);
 	
 	
@@ -121,18 +139,28 @@ int Init_Th_rgb_test(void){
 	return(0);
 }
 
-void Th_rgb_test(void*arg){
-	
-	MSGQUEUE_OBJ_RGB msg2;
-	
-	Init_Th_rgb();
-	while(1){
-		osDelay(50U);
-		if(cnt < 15)
-			cnt++;
-		else
-			cnt = 0;
-		msg2.pulse = cnt;
-		osMessageQueuePut(id_MsgQueue_rgb, &msg2, 0U, 0U);
-	}
+void Th_rgb_test(void* arg) {
+    MSGQUEUE_OBJ_RGB msgRojo;
+    MSGQUEUE_OBJ_RGB msgVerde;
+    MSGQUEUE_OBJ_RGB msgAzul;
+
+    Init_Th_rgb();
+
+    while(1) {
+        osDelay(50U);
+
+        if(cnt < 15)
+            cnt++;
+        else
+            cnt = 0;
+
+        msgRojo.pulse = cnt;   // Asigna el pulso para el color rojo
+        osMessageQueuePut(id_MsgQueue_rgb, &msgRojo, 0U, 0U);
+
+        msgVerde.pulse = cnt;  // Asigna el pulso para el color verde
+        osMessageQueuePut(id_MsgQueue_rgb, &msgVerde, 0U, 0U);
+
+        msgAzul.pulse = cnt;   // Asigna el pulso para el color azul
+        osMessageQueuePut(id_MsgQueue_rgb, &msgAzul, 0U, 0U);
+    }
 }
