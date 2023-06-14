@@ -66,26 +66,25 @@ static void myPWM_New_Pulse(TIM_HandleTypeDef htim, TIM_OC_InitTypeDef soc, MSGQ
 static void myPWM_Init(GPIO_InitTypeDef *sgpio, TIM_HandleTypeDef *htim, TIM_OC_InitTypeDef *soc){
 	/*TIM4 CHA1*/
 	__HAL_RCC_GPIOD_CLK_ENABLE();
-//	sgpio->Pin = GPIO_PIN_11;//AZUL
-//	sgpio->Mode = GPIO_MODE_AF_PP;
-//	sgpio->Alternate = GPIO_AF2_TIM4;
-//	sgpio->Pull = GPIO_NOPULL;
-//	sgpio->Speed = GPIO_SPEED_FREQ_LOW;
-//	HAL_GPIO_Init(GPIOD, sgpio);
+
 	
-//	sgpio->Pin = GPIO_PIN_12;//VERDE
-//	sgpio->Mode = GPIO_MODE_AF_PP;
-//	sgpio->Alternate = GPIO_AF2_TIM4;
-//	sgpio->Pull = GPIO_NOPULL;
-//	sgpio->Speed = GPIO_SPEED_FREQ_LOW;
-//	HAL_GPIO_Init(GPIOD, sgpio);
-	
-	sgpio->Pin = GPIO_PIN_13;//ROJO
+	sgpio->Pin = GPIO_PIN_12;//ROJO
 	sgpio->Mode = GPIO_MODE_AF_PP;
 	sgpio->Alternate = GPIO_AF2_TIM4;
 	sgpio->Pull = GPIO_NOPULL;
 	sgpio->Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	HAL_GPIO_Init(GPIOD, sgpio);
+	
+	
+	sgpio->Pin = GPIO_PIN_11; // VERDE
+	HAL_GPIO_Init(GPIOD, sgpio);
+
+	/* Configure PD13 */
+	sgpio->Pin = GPIO_PIN_13; // AZUL
+	HAL_GPIO_Init(GPIOD, sgpio);
+			
+	
+	
 	
 	__HAL_RCC_TIM4_CLK_ENABLE();
 	htim->Instance = TIM4;
@@ -94,6 +93,19 @@ static void myPWM_Init(GPIO_InitTypeDef *sgpio, TIM_HandleTypeDef *htim, TIM_OC_
 	htim->Init.CounterMode = TIM_COUNTERMODE_UP;
 	htim->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	HAL_TIM_PWM_Init(htim);
+	
+	
+	
+		/* Configure Channel 2 (PD11) */
+	HAL_TIM_PWM_ConfigChannel(htim, soc, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
+
+	/* Configure Channel 3 (PD13) */
+	HAL_TIM_PWM_ConfigChannel(htim, soc, TIM_CHANNEL_3);
+	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_3);
+		
+	
+	
 	
 	soc->OCMode = TIM_OCMODE_PWM1;
 	soc->Pulse = 49;
