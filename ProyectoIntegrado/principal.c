@@ -3,6 +3,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "stdlib.h"
+#include "com.h"
  
 osThreadId_t tid_Principal;                        // thread id
  
@@ -11,20 +12,31 @@ void principalCallback(void *argument);                   // thread function
 char _buffer[12];
 
 
-
+//Funciones USART
 typedef struct{
 	char buffer[12];	
 }Trama_TeraTerm;
 
+
+MSGQUEUE_COM_t tramaColaEnviar_COM;
+extern osThreadId_t tid_Com;   
+
+
+
+
 Trama_TeraTerm latestSamples[50];
 uint16_t pointerLatestSamples = 0;
 
-
+////Funciones sensor de color
 extern osThreadId_t tid_COLOR;
 extern osMessageQueueId_t queueColor;
 Trama_Color tramaColorRecibida;
 
+
+//Funciones Reloj
 extern 	uint16_t segundos, minutos, horas;
+
+
 
 
 
@@ -73,13 +85,14 @@ void principalCallback(void *argument) {
 			
 			case MEDIDA_MANUAL:					
 				
-			osThreadFlagsSet(tid_COLOR,0x10); ///Haz una medida bro				
-			
-			
-				//osMessageQueueGet(queueColor,&tramaColorRecibida,0U,0U);				
+				osThreadFlagsSet(tid_COLOR,0x10); ///Haz una medida bro
 				
-				if(osMessageQueueGet(queueColor,&tramaColorRecibida,0U,0U) == osOK){		
+			
+				sprintf(tramaColaEnviar_COM.string, "\r\nHOLA");
+				osMessageQueuePut(mid_COMQueue, &tramaColaEnviar_COM, 0U, 0U);
+						
 				
+				if(osMessageQueueGet(queueColor,&tramaColorRecibida,0U,0U) == osOK){				
 					addTimeStampColorQueue(tramaColorRecibida.latestSample);		
 				}				
 				

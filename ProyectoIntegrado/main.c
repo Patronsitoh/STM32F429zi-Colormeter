@@ -46,6 +46,7 @@
 #include "color.h"
 #include "clock.h"
 #include "principal.h"
+#include "com.h"
 
 
 
@@ -170,6 +171,7 @@ int main(void)
   Example: osThreadNew(app_main, NULL, NULL); */
 	init_COLOR();
 	initiClock();
+	Init_Com();
 	init_Principal();
 	
 
