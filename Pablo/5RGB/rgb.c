@@ -3,6 +3,7 @@
 #include "math.h"
 
 #define RELAC_VOL_PULSE 6.6f
+#define MAX_BRIGHTNESS 15
 
 static osThreadId_t id_Th_rgb;
 static osMessageQueueId_t id_MsgQueue_red, id_MsgQueue_green, id_MsgQueue_blue;
@@ -13,8 +14,7 @@ void Th_rgb_test(void* argument);
 static void myPWM_Init(GPIO_InitTypeDef *sgpio, TIM_HandleTypeDef *htim, TIM_OC_InitTypeDef *soc);
 static void myPWM_New_Pulse(TIM_HandleTypeDef *htim, TIM_OC_InitTypeDef *soc, MSGQUEUE_OBJ_RGB msg, uint32_t channel);
 
-uint8_t cnt = 0;
-uint8_t brightness;
+uint8_t cnt_red = 0, cnt_green = MAX_BRIGHTNESS, cnt_blue = 0;
 
 osMessageQueueId_t get_id_MsgQueue_red(void){
     return id_MsgQueue_red;
@@ -104,7 +104,6 @@ static void myPWM_Init(GPIO_InitTypeDef *sgpio, TIM_HandleTypeDef *htim, TIM_OC_
     
     /* Configure PD12 (GREEN), PD13 (RED), PD15 (BLUE) */
     sgpio->Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_15;
-		//sgpio->Pin = GPIO_PIN_15;
     sgpio->Alternate = GPIO_AF2_TIM4;
     HAL_GPIO_Init(GPIOD, sgpio);
 
@@ -127,34 +126,73 @@ static void myPWM_Init(GPIO_InitTypeDef *sgpio, TIM_HandleTypeDef *htim, TIM_OC_
 }
 
 int Init_Th_rgb_test(void){
-	id_Th_rgb_test = osThreadNew(Th_rgb_test, NULL, NULL);
-	if(id_Th_rgb_test == NULL)
-		return(-1);
-	return(0);
+    id_Th_rgb_test = osThreadNew(Th_rgb_test, NULL, NULL);
+    if(id_Th_rgb_test == NULL)
+        return(-1);
+    return(0);
 }
 
 void Th_rgb_test(void* arg) {
     MSGQUEUE_OBJ_RGB msg;
+		uint8_t brightness;
+
+
+		uint32_t tiempo = 50;
 
     Init_Th_rgb();
+		
 
     while(1) {
-        osDelay(50U);
+        // Test red LED
+        for(brightness = 0; brightness <= 100; brightness++){
+            msg.pulse = brightness;
+            osMessageQueuePut(id_MsgQueue_red, &msg, 0U, 0U);
+            osDelay(tiempo);
+        }
+        for(brightness = 100; brightness > 0; brightness--){
+            msg.pulse = brightness;
+            osMessageQueuePut(id_MsgQueue_red, &msg, 0U, 0U);
+            osDelay(tiempo);
+        }
 
-        if(cnt < 15)
-            cnt++;
-        else
-            cnt = 0;
+        // Test green LED
+        for(brightness = 0; brightness <= 100; brightness++){
+            msg.pulse = brightness;
+            osMessageQueuePut(id_MsgQueue_green, &msg, 0U, 0U);
+            osDelay(tiempo);
+        }
+        for(brightness = 100; brightness > 0; brightness--){
+            msg.pulse = brightness;
+            osMessageQueuePut(id_MsgQueue_green, &msg, 0U, 0U);
+            osDelay(tiempo);
+        }
 
-        
-				msg.pulse = cnt;   // Assigns pulse for color
+        // Test blue LED
+        for(brightness = 0; brightness <= 100; brightness++){
+            msg.pulse = brightness;
+            osMessageQueuePut(id_MsgQueue_blue, &msg, 0U, 0U);
+            osDelay(tiempo);
+        }
+        for(brightness = 100; brightness > 0; brightness--){
+            msg.pulse = brightness;
+            osMessageQueuePut(id_MsgQueue_blue, &msg, 0U, 0U);
+            osDelay(tiempo);
+        }
 
-        osMessageQueuePut(get_id_MsgQueue_red(), &msg, 0U, 0U);
-				
-				msg.pulse = 5;   // Assigns pulse for color
-        osMessageQueuePut(get_id_MsgQueue_green(), &msg, 0U, 0U);
-				
-				msg.pulse = 2;   // Assigns pulse for color
-        osMessageQueuePut(get_id_MsgQueue_blue(), &msg, 0U, 0U);
+        // Test all LEDs at once
+        for(brightness = 0; brightness <= 100; brightness++){
+            msg.pulse = brightness;
+            osMessageQueuePut(id_MsgQueue_red, &msg, 0U, 0U);
+            osMessageQueuePut(id_MsgQueue_green, &msg, 0U, 0U);
+            osMessageQueuePut(id_MsgQueue_blue, &msg, 0U, 0U);
+            osDelay(tiempo);
+        }
+        for(brightness = 100; brightness > 0; brightness--){
+            msg.pulse = brightness;
+            osMessageQueuePut(id_MsgQueue_red, &msg, 0U, 0U);
+            osMessageQueuePut(id_MsgQueue_green, &msg, 0U, 0U);
+            osMessageQueuePut(id_MsgQueue_blue, &msg, 0U, 0U);
+            osDelay(tiempo);
+        }
     }
 }
