@@ -42,7 +42,7 @@ int main(void)
   osKernelInitialize ();
   /* Init Threads */
 	
-	//Init_Th_rgb();
+	Init_Th_rgb();
 	Init_Th_rgb_test();
 	
 	/* Init Threads */
