@@ -9,7 +9,7 @@
 
 #define INACTIVO 0
 #define ACTIVO 1
-#define MANUAL 2
+#define MEDIDA 2
 #define AUTOMATICA 3
 
 #define MSGQUEUE_OBJECTS 16                    // number of Message Queue Objects
@@ -29,6 +29,38 @@ bool flag;
 
 MSGQUEUE_BACK_t almacen[50];
 osMessageQueueId_t mid_BACKQueue;
+
+int cuentaAtras;
+int medir = 0;
+int _segTarget;
+int targetTiempo = 5;
+
+
+int numMedidasAutomaticas = 20; int medidasRestantes = 20;
+int tiempoEntreMedidasAutomaticas = 10;
+
+
+
+GPIO_InitTypeDef Leds;
+void initLeds(void){
+  ////LEDS///////
+  __HAL_RCC_GPIOB_CLK_ENABLE(); //habilita alimentacion al canal B
+  Leds.Mode = GPIO_MODE_OUTPUT_PP; //Resistencia modo push pull
+  Leds.Pull = GPIO_PULLUP;
+  Leds.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  
+  Leds.Pin = GPIO_PIN_0; //LED1
+  HAL_GPIO_Init(GPIOB, &Leds);
+	Leds.Pin = GPIO_PIN_7; //LED2
+  HAL_GPIO_Init(GPIOB, &Leds);
+	//Leds.Pin = GPIO_PIN_14; //LED3
+  //HAL_GPIO_Init(GPIOB, &Leds);
+}	
+
+
+
+
+
 
 /*------------------------------------------------------------------------------
  *      Thread 1 'Thread_Principal': Módulo principal del sistema que se encarga 
@@ -57,6 +89,10 @@ int Init_Principal(void) {
     Init_Com();
     Init_Color();
     Init_RGB();
+		
+		initLeds();
+		
+		
     return (0);
 }
 
@@ -109,23 +145,56 @@ void Thread_Principal(void *argument) {
                     lcd.line = 1;
                     osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
                 }
+								
+								//medio ON, 1seg apagado; LED1
+								
+								HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0, GPIO_PIN_SET);
+								osDelay(500);
+								HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0, GPIO_PIN_RESET);
+								osDelay(500);
+										
+								
 
                 if (aux_joy == PULSE_DOWN) {
                     aux_joy = 0;
-                    modo = MANUAL;
+                    modo = MEDIDA;
                 }
                 break;
 
-            case MANUAL: // Recoge una muestra de RGB con pulsacion DOWN para replicar en el RGB
+            case MEDIDA: // Recoge una muestra de RGB con pulsacion DOWN para replicar en el RGB
                 if (aux_s != segundos || aux_min != minutos || aux_h != horas) {
                     aux_s = segundos;
                     aux_min = minutos;
                     aux_h = horas;
-                    sprintf(lcd.text, "MANUAL %02d:%02d:%02d", horas, minutos, segundos);
+                    sprintf(lcd.text, "MEDIDA %02d:%02d:%02d", horas, minutos, segundos);
                     lcd.line = 1;
                     osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
-                }
-                if (aux_joy == PULSE_DOWN) {
+                }		
+							  if (aux_joy == PULSE_DOWN) { ///Medida manual
+										
+										for(int i = targetTiempo; i > 0; i--){ ////Cuenta atrás en modo manual
+											
+											if (aux_s != segundos || aux_min != minutos || aux_h != horas) {
+												aux_s = segundos;
+												aux_min = minutos;
+												aux_h = horas;
+												sprintf(lcd.text, "MEDIDA %02d:%02d:%02d", horas, minutos, segundos);
+												lcd.line = 1;
+												osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
+											}	
+												
+											sprintf(lcd.text, "   Cuenta Atras: %2d",i);
+                      lcd.line = 2;
+                      osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
+											osDelay(1000);
+										}		
+								
+											
+									
+										HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7, GPIO_PIN_SET);
+										osDelay(350);
+										HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7, GPIO_PIN_RESET);	
+											
                     osThreadFlagsSet(tid_COLOR, 0x10); // Mando señal a colorimetro para que me devuelva valores RGB entre 0 y 255
                     if (osMessageQueueGet(mid_COLORQueue, &color, 0U, 0U) == osOK) {
                         guardaMedidas(color.red, color.green, color.blue);
@@ -141,7 +210,49 @@ void Thread_Principal(void *argument) {
                         aux_joy = 0;
                     }
                 }
-                if (aux_joy == PULSE_UP_LONG) {
+								
+								
+							
+								
+								
+								// si recibo trama correspondiente ir a automatica
+                
+								/*
+								tramasDesdePC = escucharTramas();
+								
+								if(colaCOM == cicloMedidas){
+									modo = AUTOMATICA;
+								}elseif(Puesta en hora){
+									
+								}elseif(Establecer cuentaAtras){
+								targetTiempo = COMcolaRecibida.cuentaAtras;
+								
+								
+								}elseif(leerCuentaAtrás){
+									COMcolaEnviar.cuentaAtras = targetTiempo;	
+								
+								}elseif(numeroMedidasalmacenas){
+									COMcolaEnviar.Medidasalmacenadas = puntero;
+															
+								
+								}elseif(ultimaMedia){
+									COMcolaEnviar.Medidasalmacenadas = almacen[puntero];
+								
+								}elseif(todasLasMedidas){
+									putamierda
+								
+								elseif(borrarMedidas){
+									 memset(almacen, 0, sizeof(alamacen));
+								
+								}
+								
+								
+								
+								
+								*/
+								
+								
+                if (aux_joy == PULSE_UP_LONG) { 
                     aux_joy = 0;
                     rgb.pulse_r = 0;
                     rgb.pulse_g = 0;
@@ -150,14 +261,58 @@ void Thread_Principal(void *argument) {
                     sprintf(lcd.text, "");
                     lcd.line = 2;
                     osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
-                    modo = INACTIVO;
+                    
                 }
-                // si recibo trama correspondiente ir a automatica
-                break;
+              
+								
+								
+								
+								break;
 
-            //				case AUTOMATICA://Ciclo de medidas si recibe trama correspondiente
-            //
-            //				break;
+            case AUTOMATICA://Ciclo de medidas si recibe trama correspondiente
+							
+								for(int n = numMedidasAutomaticas; n > 0; n--){
+																
+										for(int t = tiempoEntreMedidasAutomaticas; t > 0; t--){ ////Cuenta atrás en modo manual
+										
+											if (aux_s != segundos || aux_min != minutos || aux_h != horas) {
+													aux_s = segundos;
+													aux_min = minutos;
+													aux_h = horas;
+													sprintf(lcd.text, "MEDIDA %02d:%02d:%02d  C ", horas, minutos, segundos);
+													lcd.line = 1;
+													osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
+												}	
+													
+												sprintf(lcd.text, "Next: %02d",t);
+												lcd.line = 2;
+												osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
+												osDelay(1000);
+										}
+										
+										 medidasRestantes--;
+										 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7, GPIO_PIN_SET);
+										 osDelay(350);
+										 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7, GPIO_PIN_RESET);	
+												
+										 osThreadFlagsSet(tid_COLOR, 0x10); // Mando señal a colorimetro para que me devuelva valores RGB entre 0 y 255
+										 if (osMessageQueueGet(mid_COLORQueue, &color, 0U, 0U) == osOK) {
+													guardaMedidas(color.red, color.green, color.blue);
+
+													rgb.pulse_r = aux_r;
+													rgb.pulse_g = aux_g;
+													rgb.pulse_b = aux_b;
+
+													sprintf(lcd.text, "   R:%02d G:%02d B:%02d", aux_r, aux_g, aux_b);
+													lcd.line = 2;
+													osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
+													osMessageQueuePut(mid_RGBQueue, &rgb, 0U, 0U);                        
+										 }
+									}
+									modo = MEDIDA;
+								 
+						            
+							break;
         }
         osThreadYield();
     }
