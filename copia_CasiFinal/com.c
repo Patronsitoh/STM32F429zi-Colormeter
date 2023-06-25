@@ -8,6 +8,7 @@
  *      el PC a través de la línea RS232 integrada en el USB
  *---------------------------------------------------------------------------*/
  
+ #define MSGQUEUE_OBJECTS_TX 50  
  #define MSGQUEUE_OBJECTS 8                     // number of Message Queue Objects
  extern int horas;
  extern int minutos;
@@ -54,7 +55,7 @@ int Init_Com (void) {
     return(-1);
   }
 	
-			mid_COM_TXQueue = osMessageQueueNew(MSGQUEUE_OBJECTS, sizeof(MSGQUEUE_COM_TX_t), NULL);
+			mid_COM_TXQueue = osMessageQueueNew(MSGQUEUE_OBJECTS_TX, sizeof(MSGQUEUE_COM_TX_t), NULL);
   if (mid_COM_TXQueue == NULL) {
     return(-1);
   }

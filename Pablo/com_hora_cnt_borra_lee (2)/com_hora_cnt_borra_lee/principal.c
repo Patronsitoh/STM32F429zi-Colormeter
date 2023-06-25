@@ -139,7 +139,7 @@ void Thread_Principal(void *argument)
                 osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
             }
 
-            if (aux_joy == PULSE_DOWN)
+            if (aux_joy == PULSE_UP_LONG)
             {
                 aux_joy = 0;
                 modo = ACTIVO;
@@ -199,7 +199,7 @@ void Thread_Principal(void *argument)
                 horas = comrx.dh;
                 minutos = comrx.dm;
                 segundos = comrx.ds;
-                sprintf(comtx.string, "\r\n01 DF 0C \"%d:%d:%d\" FE", comrx.dh, comrx.dm, comrx.ds);
+                sprintf(comtx.string, "\r\n01 DF 0C %02d:%02d:%02d FE", comrx.dh, comrx.dm, comrx.ds);
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
                 aux_joy = 0;
             }
@@ -208,21 +208,21 @@ void Thread_Principal(void *argument)
             {
                 aux_accion = 0;
                 targetTiempo = comrx.cnt;
-                sprintf(comtx.string, "\r\n01 DA 05 \"%d\" FE", comrx.cnt);
+                sprintf(comtx.string, "\r\n01 DA 05 \"%0d\" FE", comrx.cnt);
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
             }
 
             if (aux_accion == LEER_CUENTA_ATRAS)
             {
                 aux_accion = 0;
-                sprintf(comtx.string, "\r\n01 CA 05 \"%d\" FE", targetTiempo);
+                sprintf(comtx.string, "\r\n01 CA 05 %02d FE", targetTiempo);
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
             }
 
             if (aux_accion == N_MEDIDAS_ALMACENADAS)
             {
                 aux_accion = 0;
-                sprintf(comtx.string, "\r\n01 BF 06 \"%d\" FE", puntero);
+                sprintf(comtx.string, "\r\n01 BF 06 %02d FE", puntero);
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
             }
 
@@ -247,7 +247,7 @@ void Thread_Principal(void *argument)
                 modo = AUTOMATICA;
             }
 
-            if (aux_accion == ULTIMA_MEDIDA)
+            if (aux_accion == ULTIMA_MEDIDA && puntero > 0)
             {
                 aux_accion = 0;
 
@@ -259,12 +259,12 @@ void Thread_Principal(void *argument)
                 int ro = ((pr[6] - '0') * 10) + (pr[7] - '0');   //(_buffer[6])*10 + _buffer[7];
                 int ve = ((pr[8] - '0') * 10) + (pr[9] - '0');   //(_buffer[8])*10 + _buffer[9];
                 int az = ((pr[10] - '0') * 10) + (pr[11] - '0'); //(_buffer[10])*10 + _buffer[11];
-                sprintf(comtx.string, "\r\n01 AF 015 %d:%d:%d %d-%d-%d FE", uh, um, us, ro, ve, az);
+                sprintf(comtx.string, "\r\n01 AF 015 %02d:%02d:%02d %02d-%02d-%02d FE", uh, um, us, ro, ve, az);
 
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
             }
 
-            if (aux_accion == TODAS_LAS_MEDIDAS)
+            if (aux_accion == TODAS_LAS_MEDIDAS && puntero > 0)
             {
 
                 char pr[13];
@@ -278,8 +278,9 @@ void Thread_Principal(void *argument)
                     int ro = ((pr[6] - '0') * 10) + (pr[7] - '0');   //(_buffer[6])*10 + _buffer[7];
                     int ve = ((pr[8] - '0') * 10) + (pr[9] - '0');   //(_buffer[8])*10 + _buffer[9];
                     int az = ((pr[10] - '0') * 10) + (pr[11] - '0'); //(_buffer[10])*10 + _buffer[11];
-                    sprintf(comtx.string, "\r\n01 AF 015 %d:%d:%d %d-%d-%d FE", uh, um, us, ro, ve, az);
-                    osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
+                   sprintf(comtx.string, "\r\n01 AF 015 %02d:%02d:%02d %02d-%02d-%02d FE", uh, um, us, ro, ve, az);
+                   osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
+									 osDelay(100);
                 }
             }
 
@@ -305,7 +306,7 @@ void Thread_Principal(void *argument)
                 horas = comrx.dh;
                 minutos = comrx.dm;
                 segundos = comrx.ds;
-                sprintf(comtx.string, "\r\n01 DF 0C \"%d:%d:%d\" FE", comrx.dh, comrx.dm, comrx.ds);
+                sprintf(comtx.string, "\r\n01 DF 0C %d:%d:%d FE", comrx.dh, comrx.dm, comrx.ds);
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
                 aux_joy = 0;
             }
@@ -314,21 +315,21 @@ void Thread_Principal(void *argument)
             {
                 aux_accion = 0;
                 targetTiempo = comrx.cnt;
-                sprintf(comtx.string, "\r\n01 DA 05 \"%d\" FE", comrx.cnt);
+                sprintf(comtx.string, "\r\n01 DA 05 %d FE", comrx.cnt);
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
             }
 
             if (aux_accion == LEER_CUENTA_ATRAS)
             {
                 aux_accion = 0;
-                sprintf(comtx.string, "\r\n01 CA 05 \"%d\" FE", targetTiempo);
+                sprintf(comtx.string, "\r\n01 CA 05 %d FE", targetTiempo);
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
             }
 
             if (aux_accion == N_MEDIDAS_ALMACENADAS)
             {
                 aux_accion = 0;
-                sprintf(comtx.string, "\r\n01 BF 06 \"%d\" FE", puntero);
+                sprintf(comtx.string, "\r\n01 BF 06 %d FE", puntero);
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
             }
 
@@ -353,7 +354,7 @@ void Thread_Principal(void *argument)
                 modo = AUTOMATICA;
             }
 
-            if (aux_accion == ULTIMA_MEDIDA)
+            if (aux_accion == ULTIMA_MEDIDA && puntero > 0)
             {
                 aux_accion = 0;
 
@@ -365,12 +366,12 @@ void Thread_Principal(void *argument)
                 int ro = ((pr[6] - '0') * 10) + (pr[7] - '0');   //(_buffer[6])*10 + _buffer[7];
                 int ve = ((pr[8] - '0') * 10) + (pr[9] - '0');   //(_buffer[8])*10 + _buffer[9];
                 int az = ((pr[10] - '0') * 10) + (pr[11] - '0'); //(_buffer[10])*10 + _buffer[11];
-                sprintf(comtx.string, "\r\n01 AF 015 %d:%d:%d %d-%d-%d FE", uh, um, us, ro, ve, az);
+                sprintf(comtx.string, "\r\n01 AF 015 %02d:%02d:%02d %02d-%02d-%02d FE", uh, um, us, ro, ve, az);
 
                 osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
             }
 
-            if (aux_accion == TODAS_LAS_MEDIDAS)
+            if (aux_accion == TODAS_LAS_MEDIDAS && puntero > 0)
             {
 
                 char pr[13];
@@ -384,7 +385,7 @@ void Thread_Principal(void *argument)
                     int ro = ((pr[6] - '0') * 10) + (pr[7] - '0');   //(_buffer[6])*10 + _buffer[7];
                     int ve = ((pr[8] - '0') * 10) + (pr[9] - '0');   //(_buffer[8])*10 + _buffer[9];
                     int az = ((pr[10] - '0') * 10) + (pr[11] - '0'); //(_buffer[10])*10 + _buffer[11];
-                    sprintf(comtx.string, "\r\n01 AF 015 %d:%d:%d %d-%d-%d FE", uh, um, us, ro, ve, az);
+                    sprintf(comtx.string, "\r\n01 AF 015 %02d:%02d:%02d %02d-%02d-%02d FE", uh, um, us, ro, ve, az);
                     osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
                 }
             }
