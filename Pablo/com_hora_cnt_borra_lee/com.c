@@ -86,6 +86,9 @@ void myUART_Init(void){
 void Thread_Com_Tx (void *argument){
 	osStatus_t status;
 	myUART_Init();
+	USARTdrv->Send("\r\nPreparado para enviar", 30);
+	osDelay(100);
+	
 	while(1){
 		
 		status = osMessageQueueGet(mid_COM_TXQueue, &comtx, 0U, osWaitForever);
@@ -103,6 +106,7 @@ void Thread_Com_Rx (void *argument) {
 	osStatus_t status;
 	myUART_Init();
 	
+		USARTdrv->Send("\r\nPreparado para recibir", 30);
   while (1) {
 			uint8_t valor1;
 			uint8_t valor2;
@@ -160,11 +164,11 @@ void Thread_Com_Rx (void *argument) {
 					break;
 					
 					case ULTIMA_MEDIDA:
-								//trama_ultima_medida();
+								trama_ultima_medida();
 					break;
 					
 					case TODAS_LAS_MEDIDAS:
-								//mostrar_todas_medidas();
+								mostrar_todas_medidas();
 					break;
 					
 					case BORRAR_MEDIDAS:
@@ -277,88 +281,22 @@ void trama_total_medidas(uint8_t valor){
 
 
 
-//void 	trama_ultima_medida(){
-//				uint8_t comando[28];
-//	
-//			uint8_t hora1=medidas[fin-1].hour;
-//			uint8_t minuto1=medidas[fin-1].min;
-//			uint8_t segundo1=medidas[fin-1].seg;
-//	
-//			uint8_t buf1=medidas[fin-1].buff1-48;
-//			uint8_t buf2=medidas[fin-1].buff2-48;
-//			uint8_t buf3=medidas[fin-1].buff3;
-//		
-//			uint8_t buf100=buf1*10+buf2;
+void 	trama_ultima_medida(void){
 
-//		if (fin!=0){				//Si no hay mediadas ALMACENADAS no pasa la ultima medida
-//			
-//			if(buf100!=100){		//Controla si el valor que recoge el sensor es 100% para mostrarlo
-//			comando[0]=48;		//0
-//			comando[1]=49;		//1
-//			comando[2]=32;		//ESPACIO
-//			comando[3]=65;		//A
-//			comando[4]=70;		//F
-//			comando[5]=32;		//ESPACIO
-//			comando[6]=49;		//1
-//			comando[7]=50;		//2
-//			comando[8]=32;		//ESPACIO
-//			comando[10]=(hora1/10)+48;		//hora en ascii
-//			comando[11]=(hora1%10)+48;		//hora	en ascii
-//				comando[12]=58;							//:
-//			comando[13]=(minuto1/10)+48;		//minuto en ascii
-//			comando[14]=(minuto1%10)+48;		//minuto en ascii
-//				comando[15]=58;									//:
-//			comando[16]=(segundo1/10)+48;		//segundos en ascii
-//			comando[17]=(segundo1%10)+48;		//segundos en ascii
-//			comando[18]=45;								//-
-//			comando[19]=buf1+48;		//buffer1 de temperatura
-//			comando[20]=buf2+48;		//buffer2 de temperatura
-//			comando[21]=46;					//.
-//			comando[22]=buf3;			//buffer2 de temperatura
-//			comando[23]=37;				//%
-//			comando[24]=32;		//ESPACIO
-//			comando[25]=70;		//F
-//			comando[26]=69;		//E
-//			comando[27]=10;		//SALTO DE LINEA
-//		
-//			USARTdrv->Send(comando,28);
-//			osThreadFlagsWait(0x08, osFlagsWaitAny, osWaitForever);
-//		}else{		//Solo para la representacion de 100%
-//		
-//			comando[0]=48;		//0
-//			comando[1]=49;		//1
-//			comando[2]=32;		//ESPACIO
-//			comando[3]=65;		//A
-//			comando[4]=70;		//F
-//			comando[5]=32;		//ESPACIO
-//			comando[6]=49;		//1
-//			comando[7]=50;		//2
-//			comando[8]=32;		//ESPACIO
-//			comando[10]=(hora1/10)+48;		//hora en ascii
-//			comando[11]=(hora1%10)+48;		//hora en ascii
-//			comando[12]=58;									//:
-//			comando[13]=(minuto1/10)+48;		//minuto en ascii
-//			comando[14]=(minuto1%10)+48;		//minuto en ascii
-//			comando[15]=58;									//:
-//			comando[16]=(segundo1/10)+48;		//segundos en ascii
-//			comando[17]=(segundo1%10)+48;		//segundos en ascii
-//			comando[18]=45;							//-
-//			comando[19]=1+48;			//REPRESENTA EN 100%
-//			comando[20]=0+48;
-//			comando[21]=0+48;		//
-//			comando[22]=37;			//%
-//			comando[23]=32;		//ESPACIO
-//			comando[24]=70;		//F
-//			comando[25]=69;		//E
-//			comando[26]=10;		//SALTO DE LINEA
-//		
-//			USARTdrv->Send(comando,27);
-//			osThreadFlagsWait(0x08, osFlagsWaitAny, osWaitForever);
-//		
-//		}	
-//		
-//	}
-//}
+	comrx.act = ULTIMA_MEDIDA;
+	osMessageQueuePut(mid_COM_RXQueue, &comrx, 0U, 0U);
+	
+}
+
+
+
+void mostrar_todas_medidas (void){
+	comrx.act = TODAS_LAS_MEDIDAS;
+	osMessageQueuePut(mid_COM_RXQueue, &comrx, 0U, 0U);
+	
+}
+
+
 
 //void 	mostrar_todas_medidas(){
 //			uint8_t comando[28];

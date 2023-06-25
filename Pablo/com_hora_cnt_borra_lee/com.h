@@ -53,11 +53,10 @@ void trama_borrar_medidas(void);
 
 void trama_total_medidas(uint8_t valor);
 
-//void trama_ultima_medida(void);
+void trama_ultima_medida(void);
 
 void	crear_ciclo_medidas(uint8_t valor5,uint8_t valor6,uint8_t valor8,uint8_t valor9);
-
-//void 	mostrar_todas_medidas(void);
+void 	mostrar_todas_medidas(void);
 
 void myUART_Init(void);
 #endif

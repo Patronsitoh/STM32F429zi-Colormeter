@@ -235,6 +235,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>tiempoEntreMedidasAutomaticas,0x0A</ItemText>
         </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>tramasTotalesRestantes,0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -251,6 +256,16 @@
           <count>2</count>
           <WinNumber>2</WinNumber>
           <ItemText>medidasRestantes,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>almacen</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>medidaUnica</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>

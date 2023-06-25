@@ -31,7 +31,9 @@ int cuentaAtras;
 int medir = 0;
 int _segTarget;
 int targetTiempo = 5;
+int tramasTotalesRestantes = 0;
 
+char medidaUnica[12];
 
 int numMedidasAutomaticas = 0; int medidasRestantes = 0;
 int tiempoEntreMedidasAutomaticas = 0;
@@ -58,6 +60,14 @@ void Init_Leds(void){
  *-----------------------------------------------------------------------------*/
 
 osThreadId_t tid_Principal;                        // thread id
+
+
+void obtenerMedidaUnica(int _puntero){
+	memset(medidaUnica, 0, sizeof(medidaUnica));
+	strcpy(medidaUnica, almacen[_puntero].info);
+	
+}	
+
 
 void Thread_Principal(void *argument);                   // thread function
 
@@ -212,7 +222,47 @@ void Thread_Principal(void *argument) {
 										tiempoEntreMedidasAutomaticas = comrx.tiempoMedidas;						
 									
 										modo = AUTOMATICA;	
-								}	
+								}
+
+								if(aux_accion == ULTIMA_MEDIDA){
+									aux_accion = 0;
+									//obtenerMedidaUnica(puntero-1);									
+									//sprintf(comtx.string, "\r\n01 AF 015 %s FE", medidaUnica);
+									//sprintf(comtx.string, "\r\n01 AF 015 %s FE", &almacen[puntero].info[0]);
+										
+										char pr[13];
+										strcpy(pr, almacen[puntero-1].info);
+										int uh = ((pr[0]-'0')*10) + (pr[1]-'0');//(_buffer[0])*10 + _buffer[1];
+										int um = ((pr[2]-'0')*10) + (pr[3]-'0');//(_buffer[2])*10 + _buffer[3];
+										int us = ((pr[4]-'0')*10) + (pr[5]-'0');//(_buffer[4])*10 + _buffer[5];
+										int ro = ((pr[6]-'0')*10) + (pr[7]-'0');//(_buffer[6])*10 + _buffer[7];
+										int ve = ((pr[8]-'0')*10) + (pr[9]-'0');//(_buffer[8])*10 + _buffer[9];
+										int az = ((pr[10]-'0')*10) + (pr[11]-'0');//(_buffer[10])*10 + _buffer[11];
+										sprintf(comtx.string, "\r\n01 AF 015 %d:%d:%d %d-%d-%d FE", uh, um, us, ro, ve, az);
+									
+									
+									
+									osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);
+									
+								}
+
+								if(aux_accion == TODAS_LAS_MEDIDAS){
+									
+									char pr[13];
+									aux_accion = 0;
+									for(int i= 0; i<= puntero-1; i++){										
+										strcpy(pr, almacen[i].info);
+										int uh = ((pr[0]-'0')*10) + (pr[1]-'0');//(_buffer[0])*10 + _buffer[1];
+										int um = ((pr[2]-'0')*10) + (pr[3]-'0');//(_buffer[2])*10 + _buffer[3];
+										int us = ((pr[4]-'0')*10) + (pr[5]-'0');//(_buffer[4])*10 + _buffer[5];
+										int ro = ((pr[6]-'0')*10) + (pr[7]-'0');//(_buffer[6])*10 + _buffer[7];
+										int ve = ((pr[8]-'0')*10) + (pr[9]-'0');//(_buffer[8])*10 + _buffer[9];
+										int az = ((pr[10]-'0')*10) + (pr[11]-'0');//(_buffer[10])*10 + _buffer[11];
+										sprintf(comtx.string, "\r\n01 AF 015 %d:%d:%d %d-%d-%d FE", uh, um, us, ro, ve, az);
+										osMessageQueuePut(mid_COM_TXQueue, &comtx, 0U, 0U);	
+									}
+									
+								}
 								
 								
 								
@@ -276,47 +326,8 @@ void Thread_Principal(void *argument) {
 										flag = false;
 										modo = INACTIVO;
                 }
-								break;
-								
-								
+								break;										
 							
-								
-								
-								// si recibo trama correspondiente ir a automatica
-                
-								/*
-								tramasDesdePC = escucharTramas();
-								
-								if(colaCOM == cicloMedidas){
-									modo = AUTOMATICA;
-								}elseif(Puesta en hora){
-									
-								}elseif(Establecer cuentaAtras){
-								targetTiempo = COMcolaRecibida.cuentaAtras;
-								
-								
-								}elseif(leerCuentaAtrás){
-									COMcolaEnviar.cuentaAtras = targetTiempo;	
-								
-								}elseif(numeroMedidasalmacenas){
-									COMcolaEnviar.Medidasalmacenadas = puntero;
-															
-								
-								}elseif(ultimaMedia){
-									COMcolaEnviar.Medidasalmacenadas = almacen[puntero];
-								
-								}elseif(todasLasMedidas){
-									putamierda
-								
-								elseif(borrarMedidas){
-									 memset(almacen, 0, sizeof(alamacen));
-								
-								}
-								
-								
-								
-								
-								*/
 
             case AUTOMATICA://Ciclo de medidas si recibe trama correspondiente
 							medidasRestantes = numMedidasAutomaticas;
@@ -363,6 +374,8 @@ void Thread_Principal(void *argument) {
 									sprintf(lcd.text, " ");
 									lcd.line = 2;
 									osMessageQueuePut(mid_LCDQueue, &lcd, 0U, 0U);
+									numMedidasAutomaticas = 0;
+									tiempoEntreMedidasAutomaticas = 0;
 									modo = ACTIVO;
 								 
 						            
@@ -371,6 +384,11 @@ void Thread_Principal(void *argument) {
         osThreadYield();
     }
 }
+
+
+
+
+
 
 /**
     @brief Almacena el valor recibido y lo añade a la cola de 50 ultimas medidas sitauada en RAM-
